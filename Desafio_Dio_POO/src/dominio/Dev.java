@@ -2,24 +2,32 @@ package dominio;
 
 import java.util.LinkedHashSet;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 public class Dev {
-	
+
 	private String nome;
 	private Set<Conteudo> contudosInscritos = new LinkedHashSet<>();
 	private Set<Conteudo> conteudosConcluidos = new LinkedHashSet<>();
-	
+
 	public void inscreverBootcamp(Bootcamp bootcamp) {
-		
+		this.contudosInscritos.addAll(bootcamp.getConteudos());
+		bootcamp.getDevInncritos().add(this);
 	}
-	
+
 	public void proguedir() {
-		
+		Optional<Conteudo> conteudo = this.contudosInscritos.stream().findFirst();
+		if (conteudo.isPresent()) {
+			this.conteudosConcluidos.add(conteudo.get());
+			this.contudosInscritos.remove(conteudo.get());
+		} else {
+			System.err.println("Voccê não está matriculado em nenhum conteúdo!");
+		}
 	}
-	
-	public void calcularTotalXp() {
-		
+
+	public double calcularTotalXp() {
+		return this.conteudosConcluidos.stream().mapToDouble(Conteudo::calcularXp).sum();
 	}
 
 	public String getNome() {
@@ -63,7 +71,5 @@ public class Dev {
 		return Objects.equals(conteudosConcluidos, other.conteudosConcluidos)
 				&& Objects.equals(contudosInscritos, other.contudosInscritos) && Objects.equals(nome, other.nome);
 	}
-	
-	
 
 }
